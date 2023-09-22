@@ -35,7 +35,7 @@ const ToDo = () => {
         }
     } 
 
-    const deletetask = (item) => { 
+    const deleteTask = (item) => { 
         // console.log("borrar");  
         // console.log(item)
         setTask(task.filter((task) => task != item))
@@ -72,7 +72,7 @@ const ToDo = () => {
                 <div> {task.map((task, item) => (
                         <li className= "list-group-item" 
                             style= {{paddingLeft: 15, color: "#212529a6", display: "flex", justifyContent: "space-between"}} key={item}>{task.label}
-                            <button type= "button" onClick={() => deletetask(task)}>X</button>
+                            <button type= "button" onClick={() => deleteTask(task)}>X</button>
                         </li>
                     ))} 
                 </div>
