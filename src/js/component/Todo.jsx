@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 
-let urlBase = "https://playground.4geeks.com/apis/fake/todos/user/Adjani"
+const urlBase = "https://playground.4geeks.com/apis/fake/todos/user/Adjani"
 
-
-const ToDo = () => {
+function ToDo() {
     const [task, setTask] = useState(["Tomar Agua", "Sacar Perros", "Estudiar"]);
     const [text, setText] = useState({label:"", done:false});
 
@@ -12,13 +11,12 @@ const ToDo = () => {
             ...text, 
             label:e.target.value
         })
-
     } 
 
-    const addTask = async(e) =>{
+    const handleEnter = async(e) =>{
         if (e.key === "Enter" && text !== " ") {
             try {
-                let response = await fetch(urlBase, {
+                const response = await fetch(urlBase, {
                     method:"PUT",
                     headers: {
                         "Content-Type":"application/json"
@@ -26,8 +24,8 @@ const ToDo = () => {
                     body:JSON.stringify([...task, text])
                 })
                 if (response.ok) {
-                    getTask()
-                    setText({label:"", done:false})
+                    setTask([...task, text]);
+                    setText({label:"", done:false});
                 }
             } catch (error) {
                 console.log(error);
@@ -35,16 +33,30 @@ const ToDo = () => {
         }
     } 
 
-    const deleteTask = (item) => { 
-        // console.log("borrar");  
-        // console.log(item)
-        setTask(task.filter((task) => task != item))
-    }
+    const deleteTask = async(item) => { 
+        const newArray = task.filter((taskItem) => taskItem !== item)
+        console.log("New Array", newArray); 
+        try {
+            const answer = await fetch(urlBase, {
+                method: "PUT",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(newArray)
+        });
+            if (answer.status === 200){
+                setTask(newArray)
+            };   
+        } catch (error) {
+            console.log(error);
+        }
+        console.log("si borra");
+    };
     
     const getTask = async () => {
         try { 
-            let respuesta = await fetch(urlBase)
-            let data = await respuesta.json()
+            const respuesta = await fetch(urlBase)
+            const data = await respuesta.json()
             if (respuesta.status == 404) {
                 console.log("debo crear usuario");
             }
@@ -56,7 +68,9 @@ const ToDo = () => {
         }
     }
 
-    useEffect(() => {getTask()}, [])
+    useEffect(() => {
+        getTask()
+    }, [task])
 
     return (
         <div className= "container" style={{ width: 750, backgroundColor: "#fbc7e121", padding: 50, fontSize: 20, fontFamily:"sans-serif"}}>
@@ -66,9 +80,8 @@ const ToDo = () => {
                 <input className= "list-group-item" type= "text" value= {text.label} 
                     placeholder= "No hay tareas, añadir tareas" 
                     onChange= {handleChange}
-                    onKeyDown= {addTask}>
+                    onKeyDown= {handleEnter}>
                 </input>
-
                 <div> {task.map((task, item) => (
                         <li className= "list-group-item" 
                             style= {{paddingLeft: 15, color: "#212529a6", display: "flex", justifyContent: "space-between"}} key={item}>{task.label}
@@ -83,4 +96,4 @@ const ToDo = () => {
         </div>
     )
 }
-export default ToDo;
+export default ToDo();
